@@ -9,7 +9,7 @@ export default defineConfig({
 		sveltekit(),
 		SvelteKitPWA({
 			srcDir: './src',
-			mode: 'development',
+			mode: import.meta.env.PROD ? 'production' : 'development',
 			strategies: 'generateSW',
 			type: 'module',
 			manifest: {
