@@ -1,0 +1,12 @@
+npm warn Unknown project config "minimum-release-age". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+
+> wearcast@0.0.1 dev
+> vite dev
+
+
+  VITE v8.0.16  ready in 1875 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+1:41:40 AM [vite-plugin-svelte] src/routes/settings/+page.svelte:61:3 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label

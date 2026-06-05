@@ -3,10 +3,17 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { page } from '$app/stores';
 	import { base } from '$app/paths';
+	import { onMount } from 'svelte';
+	import { requestNotificationPermission, scheduleDailyNotification } from '$lib/utils/notifications';
 	// Initialize theme on layout load so the store subscribes and handles logic
 	import '$lib/stores/theme';
 
 	let { children } = $props();
+
+	onMount(async () => {
+		await requestNotificationPermission();
+		await scheduleDailyNotification();
+	});
 </script>
 
 <svelte:head>

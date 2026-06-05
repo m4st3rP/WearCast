@@ -7,6 +7,9 @@ export interface Preferences {
 	jacketTemp: number; // recommend jacket if temp <=
 	heavyJacketTemp: number; // recommend heavy jacket if temp <=
 	umbrellaProb: number; // recommend umbrella if precipitation prob >=
+	notificationsEnabled: boolean;
+	notificationTime: string; // HH:mm format
+	unitSystem: 'metric' | 'imperial';
 }
 
 const defaultPreferences: Preferences = {
@@ -14,7 +17,10 @@ const defaultPreferences: Preferences = {
 	sweaterTemp: 20,
 	jacketTemp: 15,
 	heavyJacketTemp: 5,
-	umbrellaProb: 40
+	umbrellaProb: 40,
+	notificationsEnabled: true,
+	notificationTime: '07:00',
+	unitSystem: 'metric'
 };
 
 const initial = browser 
@@ -22,6 +28,31 @@ const initial = browser
 	: defaultPreferences;
 
 export const preferences = writable<Preferences>(initial);
+
+export function toggleUnitSystem() {
+	preferences.update(prefs => {
+		const newSystem = prefs.unitSystem === 'metric' ? 'imperial' : 'metric';
+
+		const convert = (temp: number, toMetric: boolean) => {
+			if (toMetric) {
+				return Math.round((temp - 32) * 5 / 9);
+			} else {
+				return Math.round((temp * 9 / 5) + 32);
+			}
+		};
+
+		const toMetric = newSystem === 'metric';
+
+		return {
+			...prefs,
+			unitSystem: newSystem,
+			shortsTemp: convert(prefs.shortsTemp, toMetric),
+			sweaterTemp: convert(prefs.sweaterTemp, toMetric),
+			jacketTemp: convert(prefs.jacketTemp, toMetric),
+			heavyJacketTemp: convert(prefs.heavyJacketTemp, toMetric)
+		};
+	});
+}
 
 if (browser) {
 	preferences.subscribe((value) => {
