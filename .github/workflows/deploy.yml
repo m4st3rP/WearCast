@@ -42,6 +42,8 @@ jobs:
         
       - name: Build SvelteKit App
         run: pnpm run build
+        env:
+          BASE_PATH: /WearCast
         
       - name: Setup Pages
         uses: actions/configure-pages@v6

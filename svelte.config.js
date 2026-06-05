@@ -16,7 +16,10 @@ const config = {
 			fallback: 'index.html', // for SPA mode
 			precompress: false,
 			strict: true
-		})
+		}),
+		paths: {
+			base: process.env.BASE_PATH || '',
+		}
 	}
 };
 
