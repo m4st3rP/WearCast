@@ -36,7 +36,9 @@ jobs:
           cache: "pnpm"
           
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: |
+          pnpm config set minimum-release-age 0
+          pnpm install
         
       - name: Build SvelteKit App
         run: pnpm run build
