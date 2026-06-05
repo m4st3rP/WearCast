@@ -2,6 +2,7 @@
 	import { location, requestLocation, searchLocation, setLocationManual } from '$lib/stores/location';
 	import { weather } from '$lib/stores/weather';
 	import { preferences } from '$lib/stores/preferences';
+	import { getRecommendation } from '$lib/utils/recommendation';
 
 	let searchQuery = $state('');
 
@@ -9,20 +10,17 @@
 	let recommendation = $derived(() => {
 		if (!$weather.data) return null;
 		
-		const temp = $weather.data.current.feelsLike; // Use felt temperature for recommendations
-		const precip = $weather.data.daily.precipProbMax;
-		const prefs = $preferences;
+		// For the home page, we want to look at the forecast from NOW onwards
+		const nowIdx = $weather.data.hourly.time.findIndex(t => new Date(t) > new Date());
+		const relevantHourly = {
+			...$weather.data.hourly,
+			time: $weather.data.hourly.time.slice(nowIdx, nowIdx + 16),
+			temp: $weather.data.hourly.temp.slice(nowIdx, nowIdx + 16),
+			feelsLike: $weather.data.hourly.feelsLike.slice(nowIdx, nowIdx + 16),
+			precipProb: $weather.data.hourly.precipProb.slice(nowIdx, nowIdx + 16),
+		};
 
-		let tops = 'T-Shirt';
-		if (temp <= prefs.heavyJacketTemp) tops = 'Heavy Jacket & Sweater';
-		else if (temp <= prefs.jacketTemp) tops = 'Jacket & Long Sleeve';
-		else if (temp <= prefs.sweaterTemp) tops = 'Sweater / Hoodie';
-
-		let bottoms = temp >= prefs.shortsTemp ? 'Shorts' : 'Long Pants';
-		
-		let accessories = precip >= prefs.umbrellaProb ? 'Bring an Umbrella ☂️' : 'No Umbrella needed';
-
-		return { tops, bottoms, accessories };
+		return getRecommendation({ ...$weather.data, hourly: relevantHourly }, $preferences);
 	});
 </script>
 
@@ -89,11 +87,11 @@
 	{:else if $weather.data}
 		<section class="bg-slate-100 dark:bg-slate-700 p-6 rounded-xl text-center space-y-2">
 			<h2 class="text-xl font-bold text-slate-700 dark:text-slate-200">Current Weather</h2>
-			<div class="text-5xl font-extrabold text-blue-600 dark:text-blue-400 my-4">{$weather.data.current.temp}°C</div>
-			<p class="text-slate-600 dark:text-slate-300 font-medium">Feels like <span class="font-bold text-indigo-600 dark:text-indigo-400">{$weather.data.current.feelsLike}°C</span></p>
+			<div class="text-5xl font-extrabold text-blue-600 dark:text-blue-400 my-4">{$weather.data.current.temp}{$preferences.unitSystem === 'metric' ? '°C' : '°F'}</div>
+			<p class="text-slate-600 dark:text-slate-300 font-medium">Feels like <span class="font-bold text-indigo-600 dark:text-indigo-400">{$weather.data.current.feelsLike}{$preferences.unitSystem === 'metric' ? '°C' : '°F'}</span></p>
 			<p class="text-xs text-slate-500 dark:text-slate-400 mt-1">(Recommendations use felt temperature)</p>
 			<div class="flex justify-center items-center gap-4 mt-4 text-sm text-slate-600 dark:text-slate-200 bg-white dark:bg-slate-800 p-3 rounded-lg shadow-sm w-max mx-auto border border-transparent dark:border-slate-600">
-				<div>💨 {$weather.data.current.windSpeed} km/h</div>
+				<div>💨 {$weather.data.current.windSpeed} {$preferences.unitSystem === 'metric' ? 'km/h' : 'mph'}</div>
 				<div>🌧️ {$weather.data.daily.precipProbMax}%</div>
 			</div>
 		</section>
@@ -104,11 +102,20 @@
 				👕 Outfit Suggestion
 			</h2>
 			<div class="space-y-3 pt-2">
-				<p class="text-lg flex items-center justify-between"><span class="font-semibold text-indigo-200">Tops</span> {recommendation()?.tops}</p>
-				<p class="text-lg flex items-center justify-between"><span class="font-semibold text-indigo-200">Bottoms</span> {recommendation()?.bottoms}</p>
+				<div class="text-lg flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+					<span class="font-semibold text-indigo-200">Tops</span>
+					<span>{recommendation()?.tops}</span>
+				</div>
+				<div class="text-lg flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+					<span class="font-semibold text-indigo-200">Bottoms</span>
+					<span>{recommendation()?.bottoms}</span>
+				</div>
 				<div class="mt-4 bg-indigo-800 dark:bg-indigo-900 bg-opacity-40 p-3 rounded text-center text-indigo-100 font-medium border border-indigo-500 dark:border-indigo-600">
 					{recommendation()?.accessories}
 				</div>
+				<p class="text-sm italic text-indigo-100/80 pt-2 border-t border-indigo-500/50">
+					{recommendation()?.summary}
+				</p>
 			</div>
 		</section>
 	{/if}
