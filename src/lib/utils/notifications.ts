@@ -3,7 +3,8 @@ import { Capacitor } from '@capacitor/core';
 // Dynamically import LocalNotifications to avoid resolution errors in some environments
 const getLocalNotifications = async () => {
 	if (Capacitor.isNativePlatform()) {
-		return (await import('@capacitor/local-notifications')).LocalNotifications;
+		// Use @vite-ignore to prevent Vite from trying to resolve this during web development/build
+		return (await import(/* @vite-ignore */ '@capacitor/local-notifications')).LocalNotifications;
 	}
 	return null;
 };
