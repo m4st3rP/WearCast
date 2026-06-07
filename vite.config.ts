@@ -13,7 +13,6 @@ export default defineConfig(({ mode }) => {
 				srcDir: './src',
 				mode: isProduction ? 'production' : 'development',
 				strategies: 'generateSW',
-				type: 'module',
 				manifest: {
 					short_name: 'WearCast',
 					name: 'WearCast',

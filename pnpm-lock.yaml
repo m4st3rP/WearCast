@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@capacitor/local-notifications':
-        specifier: ^8.2.0
-        version: 8.2.0(@capacitor/core@8.4.0)
     devDependencies:
       '@capacitor/android':
         specifier: ^8.4.0
@@ -21,6 +17,9 @@ importers:
       '@capacitor/core':
         specifier: ^8.4.0
         version: 8.4.0
+      '@capacitor/local-notifications':
+        specifier: ^8.2.0
+        version: 8.2.0(@capacitor/core@8.4.0)
       '@sveltejs/adapter-auto':
         specifier: ^7.0.1
         version: 7.0.1(@sveltejs/kit@2.63.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.2)(vite@8.0.16(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)))(svelte@5.56.2)(typescript@6.0.3)(vite@8.0.16(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)))
