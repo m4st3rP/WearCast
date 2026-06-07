@@ -1,5 +1,12 @@
-import { LocalNotifications } from '@capacitor/local-notifications';
 import { Capacitor } from '@capacitor/core';
+
+// Dynamically import LocalNotifications to avoid resolution errors in some environments
+const getLocalNotifications = async () => {
+	if (Capacitor.isNativePlatform()) {
+		return (await import('@capacitor/local-notifications')).LocalNotifications;
+	}
+	return null;
+};
 import { get } from 'svelte/store';
 import { preferences } from '../stores/preferences';
 import { location } from '../stores/location';
@@ -8,6 +15,9 @@ import { getRecommendation } from './recommendation';
 
 export async function requestNotificationPermission() {
 	if (Capacitor.isNativePlatform()) {
+		const LocalNotifications = await getLocalNotifications();
+		if (!LocalNotifications) return;
+
 		const status = await LocalNotifications.checkPermissions();
 		if (status.display === 'prompt') {
 			await LocalNotifications.requestPermissions();
@@ -23,8 +33,10 @@ export async function scheduleDailyNotification() {
 	const prefs = get(preferences);
 	const loc = get(location);
 
+	const LocalNotifications = await getLocalNotifications();
+
 	if (!prefs.notificationsEnabled || !loc.lat || !loc.lon) {
-		if (Capacitor.isNativePlatform()) {
+		if (LocalNotifications) {
 			const pending = await LocalNotifications.getPending();
 			if (pending.notifications.length > 0) {
 				await LocalNotifications.cancel(pending);
@@ -38,7 +50,7 @@ export async function scheduleDailyNotification() {
 		const weather = await fetchWeather(loc.lat, loc.lon, prefs.unitSystem);
 		const [hours, minutes] = prefs.notificationTime.split(':').map(Number);
 
-		if (Capacitor.isNativePlatform()) {
+		if (LocalNotifications) {
 			// Clear previous notifications first
 			const pending = await LocalNotifications.getPending();
 			if (pending.notifications.length > 0) {
