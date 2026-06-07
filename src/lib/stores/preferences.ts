@@ -48,7 +48,7 @@ const defaultPreferences: Preferences = {
 };
 
 const initial = browser 
-	? JSON.parse(window.localStorage.getItem('wearcast-prefs') || 'null') || defaultPreferences 
+	? { ...defaultPreferences, ...(JSON.parse(window.localStorage.getItem('wearcast-prefs') || '{}')) }
 	: defaultPreferences;
 
 export const preferences = writable<Preferences>(initial);

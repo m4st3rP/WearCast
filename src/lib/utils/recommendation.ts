@@ -75,16 +75,21 @@ export function getRecommendation(weather: WeatherData, prefs: Preferences): Rec
 		if (perceivedUtciC <= heavyJacketTempC || totalRequiredTopsClo > (sweaterClo + heavyJacketClo) * 0.8) {
 			tops = 'Sweater & Heavy Jacket';
 		} else if (perceivedUtciC <= jacketTempC || totalRequiredTopsClo > (sweaterClo + lightJacketClo) * 0.8) {
-			tops = isRaining ? 'Sweater & Rain Jacket' : 'Sweater & Light Jacket';
-		} else if (perceivedUtciC <= sweaterTempC || totalRequiredTopsClo > (tshirtClo + lightJacketClo) * 0.8 || totalRequiredTopsClo > sweaterClo * 0.9) {
+			// Jacket weather (but not heavy)
+			if (isRaining) {
+				tops = totalRequiredTopsClo > sweaterClo * 0.9 ? 'Sweater & Rain Jacket' : 'T-shirt & Rain Jacket';
+			} else {
+				tops = totalRequiredTopsClo > (tshirtClo + lightJacketClo) * 1.1 ? 'Sweater & Light Jacket' : 'T-shirt & Light Jacket';
+			}
+		} else if (perceivedUtciC <= sweaterTempC || totalRequiredTopsClo > sweaterClo * 0.9) {
+			// Sweater weather (but not jacket)
 			if (isRaining) {
 				tops = 'T-shirt & Rain Jacket';
-			} else if (perceivedUtciC <= jacketTempC) {
-				tops = 'T-shirt & Light Jacket';
 			} else {
 				tops = 'Sweater / Hoodie';
 			}
 		} else {
+			// T-shirt weather
 			tops = isRaining ? 'T-shirt & Rain Jacket' : 'T-shirt';
 		}
 
