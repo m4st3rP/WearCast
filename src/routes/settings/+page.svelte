@@ -87,11 +87,33 @@
 
 	<hr class="border-slate-100 dark:border-slate-700" />
 	
-	<section class="space-y-4">
+	<section class="space-y-6">
 		<div class="space-y-1">
-			<h2 class="text-lg font-semibold text-slate-700 dark:text-slate-200">Clothing Thresholds</h2>
+			<h2 class="text-lg font-semibold text-slate-700 dark:text-slate-200">Thermal Sensitivity</h2>
+			<p class="text-slate-600 dark:text-slate-400 text-sm">
+				Adjust how you perceive the cold. Positive values make you feel colder than average.
+			</p>
+		</div>
+
+		<!-- Sensitivity Slider -->
+		<div class="flex flex-col space-y-1">
+			<label for="sensitivity" class="font-semibold text-slate-700 dark:text-slate-300 flex justify-between">
+				Sensitivity Offset <span>{$preferences.sensitivity > 0 ? '+' : ''}{$preferences.sensitivity}{$preferences.unitSystem === 'metric' ? '°C' : '°F'} equivalent</span>
+			</label>
+			<input
+				id="sensitivity" type="range"
+				min="-5" max="5" step="0.5"
+				bind:value={$preferences.sensitivity}
+				class="w-full accent-indigo-600 dark:accent-indigo-400"
+			/>
+		</div>
+
+		<hr class="border-slate-100 dark:border-slate-700" />
+
+		<div class="space-y-1">
+			<h2 class="text-lg font-semibold text-slate-700 dark:text-slate-200">Clothing Thresholds (UTCI)</h2>
 			<p class="text-slate-600 dark:text-slate-400 text-sm pb-2">
-				Adjust the felt temperatures at which WearCast recommends certain types of clothing. 
+				Adjust the Universal Thermal Climate Index (UTCI) values for recommendations.
 			</p>
 		</div>
 
@@ -108,10 +130,7 @@
 				bind:value={$preferences.shortsTemp} 
 				class="w-full accent-indigo-600 dark:accent-indigo-400"
 			/>
-			<span class="text-xs text-slate-500 dark:text-slate-400">Recommend shorts if felt temp >= {$preferences.shortsTemp}{$preferences.unitSystem === 'metric' ? '°C' : '°F'}</span>
 		</div>
-		
-		<hr class="border-slate-100 dark:border-slate-700" />
 
 		<!-- Sweater -->
 		<div class="flex flex-col space-y-1">
@@ -126,10 +145,7 @@
 				bind:value={$preferences.sweaterTemp} 
 				class="w-full accent-indigo-600 dark:accent-indigo-400"
 			/>
-			<span class="text-xs text-slate-500 dark:text-slate-400">Recommend long sleeves if felt temp &lt;= {$preferences.sweaterTemp}{$preferences.unitSystem === 'metric' ? '°C' : '°F'}</span>
 		</div>
-
-		<hr class="border-slate-100 dark:border-slate-700" />
 
 		<!-- Jacket -->
 		<div class="flex flex-col space-y-1">
@@ -144,10 +160,7 @@
 				bind:value={$preferences.jacketTemp} 
 				class="w-full accent-indigo-600 dark:accent-indigo-400"
 			/>
-			<span class="text-xs text-slate-500 dark:text-slate-400">Recommend jacket if felt temp &lt;= {$preferences.jacketTemp}{$preferences.unitSystem === 'metric' ? '°C' : '°F'}</span>
 		</div>
-
-		<hr class="border-slate-100 dark:border-slate-700" />
 
 		<!-- Heavy Jacket -->
 		<div class="flex flex-col space-y-1">
@@ -162,8 +175,49 @@
 				bind:value={$preferences.heavyJacketTemp} 
 				class="w-full accent-indigo-600 dark:accent-indigo-400"
 			/>
-			<span class="text-xs text-slate-500 dark:text-slate-400">Recommend heavy jacket if felt temp &lt;= {$preferences.heavyJacketTemp}{$preferences.unitSystem === 'metric' ? '°C' : '°F'}</span>
 		</div>
+
+		<!-- Accessories -->
+		<div class="flex flex-col space-y-1">
+			<label for="accessories" class="font-semibold text-slate-700 dark:text-slate-300 flex justify-between">
+				Gloves/Hat Threshold <span>{$preferences.accessoriesTemp}{$preferences.unitSystem === 'metric' ? '°C' : '°F'}</span>
+			</label>
+			<input
+				id="accessories" type="range"
+				min={$preferences.unitSystem === 'metric' ? -20 : -4}
+				max={$preferences.unitSystem === 'metric' ? 10 : 50}
+				step="1"
+				bind:value={$preferences.accessoriesTemp}
+				class="w-full accent-indigo-600 dark:accent-indigo-400"
+			/>
+		</div>
+
+		<hr class="border-slate-100 dark:border-slate-700" />
+
+		<!-- CLO Values (Advanced) -->
+		<details class="group">
+			<summary class="flex items-center justify-between cursor-pointer list-none">
+				<h2 class="text-lg font-semibold text-slate-700 dark:text-slate-200">Advanced Clothing Insulation (CLO)</h2>
+				<span class="transition group-open:rotate-180">
+					<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+				</span>
+			</summary>
+			<div class="space-y-4 pt-4">
+				{#each Object.keys($preferences.cloValues) as item}
+					{@const key = item as keyof typeof $preferences.cloValues}
+					<div class="flex flex-col space-y-1">
+						<label for="clo-{item}" class="text-sm font-medium text-slate-700 dark:text-slate-300 flex justify-between capitalize">
+							{item.replace(/([A-Z])/g, ' $1')} <span>{$preferences.cloValues[key].toFixed(2)} CLO</span>
+						</label>
+						<input
+							id="clo-{item}" type="range" min="0" max="1.5" step="0.05"
+							bind:value={$preferences.cloValues[key]}
+							class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+						/>
+					</div>
+				{/each}
+			</div>
+		</details>
 
 		<hr class="border-slate-100 dark:border-slate-700" />
 
@@ -177,7 +231,6 @@
 				bind:value={$preferences.umbrellaProb} 
 				class="w-full accent-indigo-600 dark:accent-indigo-400"
 			/>
-			<span class="text-xs text-slate-500 dark:text-slate-400">Recommend umbrella if rain chance >= {$preferences.umbrellaProb}%</span>
 		</div>
 	</section>
 

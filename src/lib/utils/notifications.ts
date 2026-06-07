@@ -68,12 +68,14 @@ export async function scheduleDailyNotification() {
 						time: weather.hourly.time.slice(dayStart, dayEnd),
 						temp: weather.hourly.temp.slice(dayStart, dayEnd),
 						feelsLike: weather.hourly.feelsLike.slice(dayStart, dayEnd),
+						utci: weather.hourly.utci.slice(dayStart, dayEnd),
 						precipProb: weather.hourly.precipProb.slice(dayStart, dayEnd),
 					},
 					current: {
 						...weather.current,
 						temp: weather.hourly.temp[dayStart + hours] || weather.current.temp,
 						feelsLike: weather.hourly.feelsLike[dayStart + hours] || weather.current.feelsLike,
+						utci: weather.hourly.utci[dayStart + hours] || weather.current.utci,
 					}
 				};
 

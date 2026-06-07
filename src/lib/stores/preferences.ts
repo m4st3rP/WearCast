@@ -2,14 +2,26 @@ import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 
 export interface Preferences {
-	shortsTemp: number; // recommend shorts if temp is >=
-	sweaterTemp: number; // recommend sweater if temp <=
-	jacketTemp: number; // recommend jacket if temp <=
-	heavyJacketTemp: number; // recommend heavy jacket if temp <=
+	shortsTemp: number; // UTCI threshold for shorts
+	sweaterTemp: number; // UTCI threshold for sweater/hoodie
+	jacketTemp: number; // UTCI threshold for light jacket
+	heavyJacketTemp: number; // UTCI threshold for heavy jacket
+	accessoriesTemp: number; // UTCI threshold for gloves/hats
 	umbrellaProb: number; // recommend umbrella if precipitation prob >=
 	notificationsEnabled: boolean;
 	notificationTime: string; // HH:mm format
 	unitSystem: 'metric' | 'imperial';
+	sensitivity: number; // -5 to +5 offset to UTCI
+	cloValues: {
+		tshirt: number;
+		sweater: number;
+		lightJacket: number;
+		heavyJacket: number;
+		longPants: number;
+		shortPants: number;
+		gloves: number;
+		hat: number;
+	};
 }
 
 const defaultPreferences: Preferences = {
@@ -17,10 +29,22 @@ const defaultPreferences: Preferences = {
 	sweaterTemp: 20,
 	jacketTemp: 15,
 	heavyJacketTemp: 5,
+	accessoriesTemp: 0,
 	umbrellaProb: 40,
 	notificationsEnabled: true,
 	notificationTime: '07:00',
-	unitSystem: 'metric'
+	unitSystem: 'metric',
+	sensitivity: 0,
+	cloValues: {
+		tshirt: 0.1,
+		sweater: 0.3,
+		lightJacket: 0.25,
+		heavyJacket: 0.6,
+		longPants: 0.25,
+		shortPants: 0.05,
+		gloves: 0.05,
+		hat: 0.05
+	}
 };
 
 const initial = browser 
@@ -49,7 +73,8 @@ export function toggleUnitSystem() {
 			shortsTemp: convert(prefs.shortsTemp, toMetric),
 			sweaterTemp: convert(prefs.sweaterTemp, toMetric),
 			jacketTemp: convert(prefs.jacketTemp, toMetric),
-			heavyJacketTemp: convert(prefs.heavyJacketTemp, toMetric)
+			heavyJacketTemp: convert(prefs.heavyJacketTemp, toMetric),
+			accessoriesTemp: convert(prefs.accessoriesTemp, toMetric)
 		};
 	});
 }
